@@ -1,0 +1,14 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx-build/package-solution.schema.json",
+  "solution": {
+    "name": "PnP Modern Search - Search Extensibility Library Core",
+    "id": "f13a5866-004f-4219-b078-69731f848bd1",
+    "version": "4.0.0.0",
+    "includeClientSideAssets": true,
+    "skipFeatureDeployment": true,
+    "isDomainIsolated": false
+  },
+  "paths": {
+    "zippedPackage": "solution/pnp-modern-search-extensibility.sppkg"
+  }
+}

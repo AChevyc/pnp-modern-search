@@ -1,0 +1,31 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/spfx/client-side-web-part-manifest.schema.json",
+  "id": "e899ac12-9256-4c8d-a8ad-dbd20fc459c3",
+  "alias": "pnpSearchFiltersWebPart",
+  "componentType": "WebPart",
+  "version": "*",
+  "manifestVersion": 2,
+  "requiresCustomScript": false,
+  "supportedHosts": ["SharePointWebPart"],
+  "supportsThemeVariants": true,
+  "preconfiguredEntries": [
+    {
+        "groupId": "5c03119e-3074-46fd-976b-c60198311f70",
+        "group": {
+            "default": "Other"
+        },
+        "title": {
+            "default": "PnP - Search Filters",
+            "fr-fr": "pnp - Filtres de recherche"
+        },
+        "description": {
+            "default": "Filters results from the data visualizer Web Part",
+            "fr-fr": "Filtre les résultats provenant du Web Part de visualistion de données"
+        },
+        "officeFabricIconFontName": "Filter",
+        "properties": {
+          "documentationLink": "https://microsoft-search.github.io/pnp-modern-search/"
+      }
+    }
+  ]
+}

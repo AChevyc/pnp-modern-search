@@ -1,0 +1,33 @@
+{
+    "$schema": "https://developer.microsoft.com/json-schemas/spfx/client-side-web-part-manifest.schema.json",
+    "id": "42ad2740-3c60-49cf-971a-c44e33511b93",
+    "alias": "pnpSearchResultsWebPart",
+    "componentType": "WebPart",
+    "version": "*",
+    "manifestVersion": 2,
+    "requiresCustomScript": false,
+    "supportedHosts": [
+        "SharePointWebPart"
+    ],
+    "supportsThemeVariants": true,
+    "preconfiguredEntries": [
+        {
+            "groupId": "5c03119e-3074-46fd-976b-c60198311f70",
+            "group": {
+                "default": "Other"
+            },
+            "title": {
+                "default": "PnP - Modern Search",
+                "fr-fr": "PnP - Recherche Moderne"
+            },
+            "description": {
+                "default": "Displays JSON based data using customizable templates",
+                "fr-fr": "Affiche des données de multiples source de données au format JSON selon des modèles d'affichage personnalisables."
+            },
+            "officeFabricIconFontName": "SearchAndApps",
+            "properties": {
+                "documentationLink": "https://microsoft-search.github.io/pnp-modern-search/"
+            }
+        }
+    ]
+}

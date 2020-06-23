@@ -1,45 +1,79 @@
 import { SPComponentLoader } from "@microsoft/sp-loader";
-import { Log } from "@microsoft/sp-core-library";
-import { IExtensibilityLibrary } from './IExtensibilityLibrary';
+import { ServiceScope, ServiceKey, Log } from "@microsoft/sp-core-library";
+import IExtensibilityService from "./IExtensibilityService";
+import { IExtensibilityLibrary } from "@pnp/modern-search-extensibility";
+import { IExtensibilityConfiguration } from "../../models/common/IExtensibilityConfiguration";
 
-/**
- * Unique ID for the extensibility SPFx library component
- */
-const ExtensibilityService_LibraryComponentId = "2501f2fd-d601-4da4-a04d-9f0bd85b1f54";
-
-const LogSource = "ExtensibilityService";
+const ExtensibilityService_ServiceKey = "PnPModernSearchExtensibilityService";
 
 export class ExtensibilityService {
 
-    /**
-     * Loads the extensibility library component from the global or site collection app catalog.
-     */
-    public async loadExtensibilityLibrary(): Promise<IExtensibilityLibrary> {
+    private serviceScope: ServiceScope;
 
-        let extensibilityLibrary: any = undefined; 
+    public static ServiceKey: ServiceKey<IExtensibilityService> = ServiceKey.create(ExtensibilityService_ServiceKey, ExtensibilityService);
+
+    public constructor(serviceScope: ServiceScope) {
+        this.serviceScope = serviceScope;
+    }
+
+    /**
+     * Loads the extensibility libraries from the global or site collection app catalog acording to the configuration.
+     */
+    public async loadExtensibilityLibraries(librairiesConfiguration: IExtensibilityConfiguration[]): Promise<IExtensibilityLibrary[]> {
+
+        let extensibilityLibraries: IExtensibilityLibrary[] = []; 
 
         try {
 
-            const extensibilityLibraryComponent: any = await SPComponentLoader.loadComponentById(ExtensibilityService_LibraryComponentId);
+            // Load only "Enabled" configuration
+            const promises = librairiesConfiguration.filter(configuration => configuration.enabled).map(configuration => {
 
-            // Parse the library component properties to instanciate the library itself. 
-            // This way, we are not depending on a naming convention for the entry point name. We depend only on the component ID
-            const libraryMainEntryPoints = Object.keys(extensibilityLibraryComponent).filter(property => {
+                return new Promise<any>((resolve, reject) => {
 
-                // Return the library main entry point object by checking the prototype methods. They should be matching the IExtensibilityLibrary interface.
-                return property.indexOf('__') === -1 && extensibilityLibraryComponent[property].prototype.getCustomWebComponents;
+                    return SPComponentLoader.loadComponentById(configuration.id).then((extensibilityLibraryComponent: any) => {
+
+                        let extensibilityLibrary: any = undefined;
+
+                        // Parse the library component properties to instanciate the library itself. 
+                        // This way, we are not depending on a naming convention for the entry point name. We depend only on the component ID
+                        const libraryMainEntryPoints = Object.keys(extensibilityLibraryComponent).filter(property => {
+            
+                            // Return the library main entry point object by checking the prototype methods. They should be matching the IExtensibilityLibray interface.
+                            const extensibilityLibraryPrototype: IExtensibilityLibrary = extensibilityLibraryComponent[property].prototype;
+                            return property.indexOf('__') === -1 && (
+                                extensibilityLibraryPrototype.getCustomSuggestionProviders ||
+                                extensibilityLibraryPrototype.getCustomWebComponents ||
+                                extensibilityLibraryPrototype.registerHandlebarsCustomizations);
+                        });
+            
+                        // Load the library once
+                        if (libraryMainEntryPoints.length === 1) {
+                            extensibilityLibrary = new extensibilityLibraryComponent[libraryMainEntryPoints[0]]();
+                        }
+            
+                        Log.verbose(ExtensibilityService_ServiceKey, `Extensibility library component with id '${configuration.id}' and name '${libraryMainEntryPoints[0]}' loaded.`, this.serviceScope);
+                        resolve(extensibilityLibrary as IExtensibilityLibrary);   
+
+                    }).catch(error => {
+                        Log.warn(ExtensibilityService_ServiceKey, `No extensibility library component found with id '${configuration.id}'`, this.serviceScope);
+                        resolve(undefined);
+                    });
+                });
             });
 
-            if (libraryMainEntryPoints.length === 1) {
-                extensibilityLibrary = new extensibilityLibraryComponent[libraryMainEntryPoints[0]]();
-            }
+            const responses = await Promise.all(promises);
 
-            return extensibilityLibrary as IExtensibilityLibrary;
+            // Filter only on resolved libraries
+            responses.filter(response => response).forEach(response => {
+                extensibilityLibraries.push(response);
+            });
+
+            return extensibilityLibraries;
 
         } catch (error) {
 
-            Log.info(LogSource, `No extensibility library component found. Details: ${error}`);
-            return Promise.resolve(extensibilityLibrary);
+            //Resovles empty array
+            return Promise.resolve(extensibilityLibraries);
         }
     }
 }
