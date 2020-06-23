@@ -11,19 +11,6 @@ export interface ISharePointSearchService {
      */
     search(searchQuery: ISearchQuery): Promise<ISharePointSearchResults>;
 
-    /**
-     * Searches for all site collections with a path which starts by the specified url or containing the specific query text
-	 * @param startingUrl 
-	 * @param queryText 
-	 */
-    getSitesStartingWith(startingUrl: string, queryText?: string): Promise<string[]>;
-
-    /**
-	 * Searches for all webs with a path which starts by the specified url
-	 * @param siteUrl The url of the site collection from which to find the webs
-	 */
-	getWebsFromSite(siteUrl: string): Promise<ISearchResult[]>;
-	
 	/**
      * Gets available search managed properties in the search schema
      */
@@ -32,7 +19,7 @@ export interface ISharePointSearchService {
 	/**
      * Gets all available languages for the search query
      */
-    getAvailableQueryLanguages(): Promise<any>;
+     getAvailableQueryLanguages(): Promise<any>;
 
     /**
      * Checks if the provided manage property is sortable or not
